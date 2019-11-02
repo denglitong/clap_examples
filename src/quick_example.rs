@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 pub mod a {
     use clap::{App, Arg};
 
@@ -58,6 +60,44 @@ pub mod a {
         }
 
         // see how many times a particular flag or argument occurred, only flags can have multiple occurrences
+        match matches.occurrences_of("debug") {
+            0 => println!("Debug mode is off"),
+            1 => println!("Debug mode is kind of on"),
+            2 => println!("Debug mode is on"),
+            3 | _ => println!("Don't be crazy"),
+        }
+
+        if let Some(ref matches) = matches.subcommand_matches("test") {
+            if matches.is_present("list") {
+                println!("Printing testing lists...");
+            } else {
+                println!("Not printing testing lists...");
+            }
+        }
+    }
+}
+
+pub mod b {
+    use clap::App;
+
+    pub fn main() {
+        let matches = App::new("MyApp")
+            .version("1.0")
+            .about("Does awesome things")
+            .arg_from_usage("-c, --config=[FILE] 'Sets a custom config file'")
+            .arg_from_usage("<output> 'Sets an optional output file'")
+            .arg_from_usage("-d, --debug... 'Turn debugging information on'")
+            .subcommand(App::new("test").arg_from_usage("-l, --list 'list test values'"))
+            .get_matches();
+
+        if let Some(c) = matches.value_of("config") {
+            println!("Value of config: {}", c);
+        }
+
+        if let Some(o) = matches.value_of("output") {
+            println!("Value of output: {}", o);
+        }
+
         match matches.occurrences_of("debug") {
             0 => println!("Debug mode is off"),
             1 => println!("Debug mode is kind of on"),
